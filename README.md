@@ -1,4 +1,4 @@
-# Kanhaiyya (कन्हैया) 🦚✨
+# Kanhaiyya
 
 Luxury devotional e-commerce platform dedicated to handcrafted poshaks and sacred shringar for Thakurji, Shri Radha Rani, and Laddu Gopal. Inspired by Vrindavan heritage with modern editorial aesthetics.
 
