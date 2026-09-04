@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #1A1A1A;
+  --accent: #1A1A1A;
+  --muted: #767676;
+  --border: #E5E5E5;
+  --surface: #F5F5F5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-serif: var(--font-serif), Georgia, serif;
+  --font-sans: var(--font-sans), Inter, sans-serif;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FFFFFF;
+  color: #1A1A1A;
+  font-family: var(--font-sans), Inter, sans-serif;
+}
+
+/* Premium scrollbar — subtle */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4D4D4;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1A1A1A;
+}
+
+/* Selection */
+::selection {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+/* Smooth image load */
+img {
+  transition: opacity 0.3s ease;
+}
+
+/* Focus ring override */
+*:focus-visible {
+  outline: 2px solid #1A1A1A;
+  outline-offset: 2px;
+}
+
+/* Underline link animation */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #1A1A1A;
+  transition: width 0.3s ease;
+}
+.link-underline:hover::after {
+  width: 100%;
+}

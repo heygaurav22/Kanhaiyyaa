@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String?
+  addresses Address[]
+  orders    Order[]
+  cartItems CartItem[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Address {
+  id       String  @id @default(cuid())
+  userId   String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label    String? // "Home", "Office", etc.
+  line1    String
+  line2    String?
+  city     String
+  state    String
+  postcode String
+  country  String  @default("India")
+  phone    String
+  orders   Order[]
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  slug     String     @unique
+  description String?
+  image    String?
+  parentId String?
+  parent   Category?  @relation("Subcategories", fields: [parentId], references: [id])
+  children Category[] @relation("Subcategories")
+  products Product[]
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([parentId])
+  @@index([slug])
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String
+  details     String?     // About the Poshak
+  fabric      String?     // Fabric & Craft details
+  careInfo    String?     // Care instructions
+  included    String?     // What's included
+  price       Int         // in paise (e.g., 249900 = ₹2,499)
+  comparePrice Int?       // original/MRP price for showing discount
+  currency    String      @default("INR")
+  images      String      @default("[]") // JSON string array of image URLs
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  variants    Variant[]
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  featured    Boolean     @default(false)
+  isNew       Boolean     @default(false)
+  rating      Float       @default(4.5)
+  reviewCount Int         @default(0)
+  tags        String      @default("[]") // JSON string array of tags
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([featured])
+}
+
+model Variant {
+  id        String     @id @default(cuid())
+  productId String
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String?    // "1", "2", "3", "4", "5"
+  color     String?    // "Ivory", "Blue", "Pink", etc.
+  colorHex  String?    // hex code for swatch display
+  stock     Int        @default(10)
+  sku       String?
+  cartItems CartItem[]
+  createdAt DateTime   @default(now())
+
+  @@index([productId])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String?
+  variant   Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId, variantId])
+  @@index([userId])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+  addressId     String
+  address       Address     @relation(fields: [addressId], references: [id])
+  status        OrderStatus @default(PENDING)
+  total         Int         // in paise
+  subtotal      Int         // in paise
+  shipping      Int         @default(0)
+  paymentMethod String      @default("COD")
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+  variantId   String?
+  productName String  // snapshot at time of order
+  size        String?
+  color       String?
+  quantity    Int
+  price       Int     // price at time of order (paise)
+  image       String? // snapshot
+
+  @@index([orderId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
